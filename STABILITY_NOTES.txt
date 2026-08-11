@@ -1,0 +1,29 @@
+PS4 CSSFontFace GoldHEN Host — Stability Build r4
+
+Changes over r3:
+- Warm payload cache: the kernel patches + GoldHEN payload are fetched into
+  memory during the countdown, BEFORE any race starts. After the jailbreak the
+  exploit performs ZERO network I/O, so a post-jailbreak fetch failure can no
+  longer abort the run ("stuck before ===END===" cases).
+- Script loading now retries once on failure, so transient network blips do
+  not abort the whole run.
+- Stall watchdog: if the run makes no progress for 45 seconds (worker RPC
+  hang, promise never resolving, ...) the page reloads itself automatically
+  and retries, instead of hanging forever.
+- Post-jailbreak fetch fallback uses 3 attempts with backoff (fetchBufRetry).
+- Console heartbeat: every console line resets the watchdog, so long
+  kernel-chain loops are never mistaken for a stall.
+- New PS4-style theme (dark navy + gold), same UI structure/IDs as r3.
+
+Unchanged on purpose:
+- The firmware-specific exploit primitives, patch binaries and the kernel
+  chains (Lapse/NetCtrl) were intentionally left untouched — they are
+  timing-sensitive and must not be altered without per-firmware testing.
+
+Important: if the PS4 actually powers off/reboots because of a kernel panic,
+the browser cannot perform an automatic retry after the reboot. In that case,
+restart the browser/host and try again.
+
+For best stability: use a wired LAN connection for the console, serve the host
+from the same network, and close/reopen the PS4 browser app if several retries
+fail in a row (this resets WebKit state).
